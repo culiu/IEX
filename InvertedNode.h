@@ -22,7 +22,7 @@ public:
 		//names = keys = NULL;
 	}
 
-	InvertedNode(string k, int nsize, vector<string> files)
+	InvertedNode(string k, int nsize, const vector<string>& files)
 	{
 		keyword = k;
 		docsize = nsize;
@@ -31,7 +31,7 @@ public:
 	void setDocSize(int nsize){
 		docsize = nsize;
 	}
-	void setFileNames(vector<string> files){
+	void setFileNames(const vector<string>& files){
 		fileNames = files;
 	}
 	void setKeyword(string k){

@@ -51,7 +51,7 @@ void initFile(){
 	output = prefixDir + "IEXResult/1b_result.txt";
 }
 
-vector<string> vectors_intersection(vector<string> v1, vector<string> v2){
+vector<string> vectors_intersection(const vector<string> &v1, const vector<string> &v2){
 	vector<string> v;
 	/*因为保证了有序，所以不需要排序*/
 	//sort(v1.begin(), v1.end());
@@ -77,6 +77,7 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 	set<string> keySet; //本地的编译环境使用string&编译不通过
 	bool hasConjunctive;
 	/*遍历每一个InvertedIndex*/
+
 	for (IDataSet.setStart(); IDataSet.getValue(iNode1);IDataSet.next()){
 		key1 = iNode1.keyword;
 		fileList1 = iNode1.fileNames;/*key1对应的文档*/
@@ -98,15 +99,13 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 			cout << "error happened keySet.size() = 0" << endl;
 		}*/
 		set<string>::iterator it;//本地的编译环境使用string&编译不通过
-		temp_table = new HashTable<string, AList<string, CompStr>*, StringKeyHash>(keySet.size() * 2);/*inner hashtable load factor = 0.5*/
-		/*遍历每一个与key1有交集的关键字key2*/
+		temp_table = new HashTable<string, AList<string, CompStr>*, StringKeyHash>(keySet.size() * 2);
 		for (it = keySet.begin(); it != keySet.end(); it++){
 			if (A1->get(*it, iNode2)){
 				fileList2 = iNode2.fileNames;
-				/*这里要求fileList1与fileList2的交集*/
 				fileList = vectors_intersection(fileList1,fileList2);
-				if (fileList.size() != 0){/*如果要添加参数P，是这里*/
-					fileNames = StringUtil::vectorToAList(fileList);/*在方法内部new了*/
+				if (fileList.size() != 0){
+					fileNames = StringUtil::vectorToAList(fileList);
 					temp_table->insert(*it, fileNames);
 					hasConjunctive = true;
 				}
@@ -116,6 +115,8 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 		if (hasConjunctive){
 			EMM->insert(key1, temp_table);
 		}
+
+		delete temp_table;
 		keySet.clear();
 	}
 }
@@ -209,7 +210,6 @@ int main(){
 		for (QuerySet.setStart(); QuerySet.getValue(Query); QuerySet.next()){
 			Result->clear();
 			helper->disQuery_t(Query, Result);
-			cout << "Result.size() = " << Result->getListSize() << endl;
 			//fout << "Result.size() = " << Result->getListSize() << endl;
 		}
 		query_end = clock();
