@@ -10,7 +10,7 @@
 #include "algorithm"
 #include "iterator"
 #include <set>
-#define DATA_NUMS 500000
+#define DATA_NUMS 100000
 #define KEYSIZE 500000
 #define EMM_SIZE 9000000
 #pragma comment(linker, "/STACK:1024000000,1024000000")
@@ -25,7 +25,7 @@ AList<InvertedNode, CompINode> DataSet(KEYSIZE);
 AList<Node, CompNode> iDKeySet(DATA_NUMS);
 AList<AList<string, CompStr>*, CompInt> QuerySet(1000);
 string prefixDir = "../../IEX_data/";
-string tag="1b";
+string tag = "1b";
 
 void initFile(){
 	string dataSize = StringUtil::intToString((DATA_NUMS / 10000)) + "w";
@@ -42,15 +42,15 @@ void initFile(){
 
 
 	/*测试路径*/
-	iiFName = prefixDir + "QuerySet_test/"+tag+"/querySetAll.txt";
-	dirFNames = prefixDir+ "keywords/"+tag+"_names.txt";
-	keywordDir = prefixDir + "keywords/"+tag+"/";
+	iiFName = prefixDir + "QuerySet_test/" + tag + "/querySetAll.txt";
+	dirFNames = prefixDir + "keywords/" + tag + "_names.txt";
+	keywordDir = prefixDir + "keywords/" + tag + "/";
 	/*conjunctive querySet文件路径*/
-	c_prefix = prefixDir + "QuerySet_test/"+tag+"/conjunctive/";
+	c_prefix = prefixDir + "QuerySet_test/" + tag + "/conjunctive/";
 	/*disjunctive querySet文件路径*/
-	d_prefix = prefixDir + "QuerySet_test/"+tag+"/disjunctive/";
+	d_prefix = prefixDir + "QuerySet_test/" + tag + "/disjunctive/";
 	/*输出文件路径*/
-	output = prefixDir + "IEXResult/"+tag+"_result.txt";
+	output = prefixDir + "IEXResult/" + tag + "_result.txt";
 }
 
 vector<string> vectors_intersection(const vector<string> &v1, const vector<string> &v2){
@@ -64,15 +64,15 @@ vector<string> vectors_intersection(const vector<string> &v1, const vector<strin
 
 
 void genEMMData
-(AList<InvertedNode, CompINode> &IDataSet,HashTable<string, InvertedNode, StringKeyHash> *A1, HashTable<string, Node, StringKeyHash> *A2,
-HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *EMM){
+(AList<InvertedNode, CompINode> &IDataSet, HashTable<string, InvertedNode, StringKeyHash> *A1, HashTable<string, Node, StringKeyHash> *A2,
+HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *EMM, int &indexSize){
 	//double p = 0.2;
 	/*保存当前关键字的内层table*/
 	HashTable<string, AList<string, CompStr>*, StringKeyHash> *temp_table;
-	InvertedNode iNode1,iNode2;
+	InvertedNode iNode1, iNode2;
 	Node node1;
 	string key1, key2;
-	vector<string> fileList,fileList1,fileList2;
+	vector<string> fileList, fileList1, fileList2;
 	AList<string, CompStr> *keywords;
 	AList<string, CompStr> *fileNames;
 	/*保存某些文档对应的key值*/
@@ -80,11 +80,11 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 	bool hasConjunctive;
 	/*遍历每一个InvertedIndex*/
 
-	for (IDataSet.setStart(); IDataSet.getValue(iNode1);IDataSet.next()){
+	for (IDataSet.setStart(); IDataSet.getValue(iNode1); IDataSet.next()){
 		key1 = iNode1.keyword;
 		fileList1 = iNode1.fileNames;/*key1对应的文档*/
 		hasConjunctive = false;
-			/*将所有文档对应的关键字去重放到keySet中*/
+		/*将所有文档对应的关键字去重放到keySet中*/
 		for (int i = 0; i < fileList1.size(); i++){
 			//找到文档对应的关键字
 			A2->get(fileList1[i], node1);
@@ -93,21 +93,22 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 			for (keywords->setStart(); keywords->getValue(key2); keywords->next())
 				//if (key2.compare(key1) != 0)/*比较两个字符串是否相等,不相等则加入容器*/  
 				//这里全加入就行了，因为QuerySet保证了不会求某个关键字和自己的并集
-				keySet.insert(key2);				
+				keySet.insert(key2);
 		}
 		/*
 		if (keySet.size() <= 0){
-			continue;
-			cout << "error happened keySet.size() = 0" << endl;
+		continue;
+		cout << "error happened keySet.size() = 0" << endl;
 		}*/
 		set<string>::iterator it;//本地的编译环境使用string&编译不通过
 		temp_table = new HashTable<string, AList<string, CompStr>*, StringKeyHash>(keySet.size() * 2);
 		for (it = keySet.begin(); it != keySet.end(); it++){
 			if (A1->get(*it, iNode2)){
 				fileList2 = iNode2.fileNames;
-				fileList = vectors_intersection(fileList1,fileList2);
+				fileList = vectors_intersection(fileList1, fileList2);
 				if (fileList.size() != 0){
 					fileNames = StringUtil::vectorToAList(fileList);
+					indexSize++;
 					temp_table->insert(*it, fileNames);
 					hasConjunctive = true;
 				}
@@ -138,7 +139,7 @@ int main(int argc, char **argv){
 	FileUtil::readDatas(FileSet, iDKeySet, keywordDir);
 	cout << "read File data success" << endl;
 
-	
+
 	/*读取InvertedNode数据到内存*/
 	int elem_count = 0;//记录倒排索引 键值对的个数，暂时用不着
 	FileUtil::readIData(iiFName, DataSet, elem_count);
@@ -147,51 +148,53 @@ int main(int argc, char **argv){
 	HashTable<string, AList<string, CompStr>*, StringKeyHash> *GGM = new HashTable<string, AList<string, CompStr>*, StringKeyHash>(tableMaxsize);
 	cout << "get invertedIndex Data success" << endl;
 
-	
-	HashTable<string, InvertedNode, StringKeyHash> *key_idtable = new HashTable<string, InvertedNode, StringKeyHash>(DataSet.getListSize()*2);
+
+	HashTable<string, InvertedNode, StringKeyHash> *key_idtable = new HashTable<string, InvertedNode, StringKeyHash>(DataSet.getListSize() * 2);
 	HashTable<string, Node, StringKeyHash> *id_keytable = new HashTable<string, Node, StringKeyHash>(iDKeySet.getListSize() * 2);
 	InvertedNode inode;
 	Node node;
 	for (DataSet.setStart(); DataSet.getValue(inode); DataSet.next())
-		key_idtable->insert(inode.keyword,inode);
-	cout << "insert key->id table success;"<<endl;
+		key_idtable->insert(inode.keyword, inode);
+	cout << "insert key->id table success;" << endl;
 	for (iDKeySet.setStart(); iDKeySet.getValue(node); iDKeySet.next())
 		id_keytable->insert(node.names, node);
-	cout << "insert id->key table success;"<<endl;
+	cout << "insert id->key table success;" << endl;
 	/*gen EMM*/
-	HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *EMM 
+	HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *EMM
 		= new HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash >(tableMaxsize);
 	time_t EMM_start;
 	time_t EMM_end;
+	int indexSize = 0;
 	EMM_start = clock();
-	genEMMData(DataSet, key_idtable,id_keytable,EMM);
+	genEMMData(DataSet, key_idtable, id_keytable, EMM, indexSize);
 	EMM_end = clock();
-	process_time = (double) (EMM_end - EMM_start) / CLOCKS_PER_SEC;
+	process_time = (double)(EMM_end - EMM_start) / CLOCKS_PER_SEC;
 	cout << "EMM init time = " << process_time << " s" << endl;
-
+	fout << process_time << " " << indexSize << endl;
 	/*将InvertedNodes数据读入GMM中*/
 	DataSet.setStart();
 	int docsSize;
 	string keyword;
 	vector<string> docs;
 	InvertedNode iNode;
-	AList<string,CompStr>* docsList;
+	AList<string, CompStr>* docsList;
 	time_t insert_start = clock();
 	DataSet.getValue(iNode);
 	while (DataSet.getValue(iNode)){
 		docsSize = iNode.docsize;
 		keyword = iNode.keyword;
 		docs = iNode.fileNames;
-		docsList = new AList<string,CompStr>(docsSize);
+		docsList = new AList<string, CompStr>(docsSize);
 		for (unsigned int i = 0; i < docs.size(); i++)
 			docsList->append(docs[i]);
 		GGM->insert(keyword, docsList);
 		DataSet.next();
 	}
 	time_t insert_end = clock();
-	process_time = (double)((insert_end - insert_start) * 1000) / CLOCKS_PER_SEC;
-	cout << "GGM init time = " << process_time << " ms" << endl;
-	ExpHelper *helper = new ExpHelper(GGM,EMM);
+	process_time = (double)(insert_end - insert_start) / CLOCKS_PER_SEC;
+	fout << process_time << endl;
+	cout << "GGM init time = " << process_time << "s" << endl;
+	ExpHelper *helper = new ExpHelper(GGM, EMM);
 	//3.测试多个关键字的conjunctive
 	//获取Query
 	AList<string, CompStr> *Result = new AList<string, CompStr>(150);
@@ -224,8 +227,8 @@ int main(int argc, char **argv){
 		fout << process_time << endl;
 		QuerySet.clear();
 	}
-		//delete helper;
-		system("pause");
+	//delete helper;
+	system("pause");
 }
 
 /*集合S1，S2....Sn,取出S1，Result = S1, 暂时不需要调用*/

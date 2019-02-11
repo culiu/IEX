@@ -23,10 +23,10 @@ public:
 		SAFE_DEL(p_EMM);
 	}
 	/*param1：query condition
-	  param2：result
-	  多个关键字的conjunctive
+	param2：result
+	多个关键字的conjunctive
 	*/
-	void conQuery(AList<string, CompStr> *Query,AList<string, CompStr> *Result){
+	void conQuery(AList<string, CompStr> *Query, AList<string, CompStr> *Result){
 		/*取出第一个关键字去GMM中查询结果*/
 		string curr;/*当前关键字*/
 		string f_n;
@@ -44,8 +44,8 @@ public:
 		/*从第二个关键字到最后一个关键字，判断对应的GMM中的集合元素是否在Result中，如果不在则去掉*/
 		if (Result->getListSize() != 0){
 			while (Query->getValue(curr)){
-				p_GMM->get(curr,p_temp);
-				SetConjunction(Result,p_temp);
+				p_GMM->get(curr, p_temp);
+				SetConjunction(Result, p_temp);
 				Query->next();
 			}
 		}
@@ -66,14 +66,14 @@ public:
 				p_S2->next();
 			else
 				p_S1->remove(temp);
-			
+
 		}
 		while (p_S1->getValue(value1))
 			/*当前元素与之后的元素都需要删除*/
 			p_S1->remove(temp);
 	}
 	/*从S1中删除同时存在在S2中的元素*/
-	void SetRemove(AList<string, CompStr>*p_S1, AList<string, CompStr>*p_S2){
+	void SetRemove_n(AList<string, CompStr>*p_S1, AList<string, CompStr>*p_S2){
 		/*密文需要排序*/
 		p_S1->sort();
 		p_S2->sort();
@@ -94,26 +94,38 @@ public:
 		}
 	}
 
+	void SetRemove(AList<string, CompStr>*p_S1, AList<string, CompStr>*p_S2){
+		string value1, value2, temp;
+		for (p_S2->setStart(); p_S2->getValue(value2); p_S2->next()){
+			for (p_S1->setStart(); p_S1->getValue(value1); p_S1->next()){
+				int compareResult = strcmp(value1.c_str(), value2.c_str());/*it may work*/
+				if (compareResult == 0){
+					p_S1->remove(temp);
+					break;
+				}
+			}
+		}
+	}
 
 	/*本方法暂不通用多个关键字，暂只做了2个关键字*/
 	void disQuery_t(AList<string, CompStr> *Query, AList<string, CompStr>* Result){
 		string k1 = Query->getPosValue(0);
 		string k2 = Query->getPosValue(1);
 		string temp;
-		AList<string, CompStr> *R1,*R2;
+		AList<string, CompStr> *R1, *R2;
 		HashTable<string, AList<string, CompStr>*, StringKeyHash> *t_table;
 		AList<string, CompStr> *temp_List = new AList<string, CompStr>(150);/*除非参与disjunctive的某一个关键字对应的文档大于这个数，否则不需要修改这个值*/
-	
+
 		if (p_GMM->get(k1, R1)){
 			//HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *p_E
-			p_EMM->get(k1,t_table);
+			p_EMM->get(k1, t_table);
 			if (t_table->get(k2, R2)){
 				/*k1,k2有交集*/
 				/*fix a bug:如果修改指针指向元素的内容，那么他对应的hashtable中的内容也会被修改*/
 				temp_List->clear();
 				for (R1->setStart(); R1->getValue(temp); R1->next())
 					temp_List->append(temp);
-				SetRemove(temp_List,R2);
+				SetRemove(temp_List, R2);
 				for (temp_List->setStart(); temp_List->getValue(temp); temp_List->next())
 					Result->append(temp);
 				p_GMM->get(k2, R2);
@@ -133,7 +145,7 @@ public:
 					for (R1->setStart(); R1->getValue(temp); R1->next())
 						Result->append(temp);
 				}
-				
+
 			}
 		}
 		else{
@@ -145,7 +157,7 @@ public:
 			}
 		}
 	}
-	
+
 
 
 private:
