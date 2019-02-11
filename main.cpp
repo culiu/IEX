@@ -10,7 +10,7 @@
 #include "algorithm"
 #include "iterator"
 #include <set>
-#define DATA_NUMS 100
+#define DATA_NUMS 100000
 #define KEYSIZE 500000
 #define EMM_SIZE 9000000
 #pragma comment(linker, "/STACK:1024000000,1024000000")
@@ -24,7 +24,9 @@ AList<InvertedNode, CompINode> DataSet(KEYSIZE);
 /*id,k pairs Data*/
 AList<Node, CompNode> iDKeySet(DATA_NUMS);
 AList<AList<string, CompStr>*, CompInt> QuerySet(1000);
-string prefixDir = "../../datas/";
+string prefixDir = "../../IEX_data/";
+string tag="1b";
+
 void initFile(){
 	string dataSize = StringUtil::intToString((DATA_NUMS / 10000)) + "w";
 	cout << "dataSize = " << dataSize << endl;
@@ -40,15 +42,15 @@ void initFile(){
 
 
 	/*测试路径*/
-	iiFName = prefixDir + "QuerySet_test/1b/querySetAll.txt";
-	dirFNames = prefixDir+ "keywords/1b_names.txt";
-	keywordDir = prefixDir + "keywords/1b/";
+	iiFName = prefixDir + "QuerySet_test/"+tag+"/querySetAll.txt";
+	dirFNames = prefixDir+ "keywords/"+tag+"_names.txt";
+	keywordDir = prefixDir + "keywords/"+tag+"/";
 	/*conjunctive querySet文件路径*/
-	c_prefix = prefixDir + "QuerySet_test/1b/conjunctive/";
+	c_prefix = prefixDir + "QuerySet_test/"+tag+"/conjunctive/";
 	/*disjunctive querySet文件路径*/
-	d_prefix = prefixDir + "QuerySet_test/1b/disjunctive/";
+	d_prefix = prefixDir + "QuerySet_test/"+tag+"/disjunctive/";
 	/*输出文件路径*/
-	output = prefixDir + "IEXResult/1b_result.txt";
+	output = prefixDir + "IEXResult/"+tag+"_result.txt";
 }
 
 vector<string> vectors_intersection(const vector<string> &v1, const vector<string> &v2){
@@ -122,7 +124,12 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 }
 
 
-int main(){
+int main(int argc, char **argv){
+
+	if (argc > 1) {
+		tag = argv[1];
+	}
+
 	initFile();
 	ofstream fout;
 	fout.open(output.c_str(), ios::out);

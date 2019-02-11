@@ -5,7 +5,7 @@
 #include <string>
 //#include <io.h>
 #include "CompStr.h"
-#include "Alist.h"
+#include "AList.h"
 #include "CompINode.h"
 #include "StringUtil.h"
 #include "CompInt.h"

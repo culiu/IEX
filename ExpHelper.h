@@ -5,8 +5,9 @@
 #define _EXPHELPER_
 #include "hashtable.h"
 #include "StringKeyHash.h"
-#include "Alist.h"
+#include "AList.h"
 #include "CompStr.h"
+#include <string.h>
 using namespace std;
 #define SAFE_DEL(x) { if (x != NULL) delete x; x = NULL; }
 class ExpHelper
