@@ -10,7 +10,7 @@
 #include "algorithm"
 #include "iterator"
 #include <set>
-#define DATA_NUMS 100000
+#define DATA_NUMS 500000
 #define KEYSIZE 500000
 #define EMM_SIZE 9000000
 #pragma comment(linker, "/STACK:1024000000,1024000000")
@@ -118,7 +118,6 @@ HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, St
 			EMM->insert(key1, temp_table);
 		}
 
-		delete temp_table;
 		keySet.clear();
 	}
 }
