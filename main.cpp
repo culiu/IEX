@@ -10,7 +10,7 @@
 #include "algorithm"
 #include "iterator"
 #include <set>
-#define DATA_NUMS 100000
+#define DATA_NUMS 500000
 #define KEYSIZE 500000
 #define EMM_SIZE 9000000
 #pragma comment(linker, "/STACK:1024000000,1024000000")
@@ -48,7 +48,7 @@ void initFile(){
 	/*conjunctive querySet文件路径*/
 	c_prefix = prefixDir + "QuerySet_test/" + tag + "/conjunctive/";
 	/*disjunctive querySet文件路径*/
-	d_prefix = prefixDir + "QuerySet_test/" + tag + "/disjunctive/";
+	d_prefix = prefixDir + "QuerySet_test/" + tag + "/disjunctive/2/";
 	/*输出文件路径*/
 	output = prefixDir + "IEXResult/" + tag + "_result.txt";
 }
