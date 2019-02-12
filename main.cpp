@@ -166,6 +166,7 @@ int main(int argc, char **argv){
 	time_t EMM_end;
 	int indexSize = 0;
 	EMM_start = clock();
+	fout << DataSet.getListSize() << endl;
 	genEMMData(DataSet, key_idtable, id_keytable, EMM, indexSize);
 	EMM_end = clock();
 	process_time = (double)(EMM_end - EMM_start) / CLOCKS_PER_SEC;
@@ -211,15 +212,15 @@ int main(int argc, char **argv){
 	for (int i = 10; i <= 100; i += 10){
 		temp_querySet = d_prefix + "query_" + StringUtil::intToString(i) + ".txt";
 		cout << "temp_querySet = " << temp_querySet << endl;
-		//fout << "temp_querySet = " << temp_querySet << endl;
+	//	fout << "temp_querySet = " << temp_querySet << endl;
 		FileUtil::readQueryData(temp_querySet, QuerySet, 2);
 		cout << "QueryCount = " << i << " Read QuerySet Success QuerySet.getListSize() = " << QuerySet.getListSize() << endl;
-		//fout << "QueryCount = " << i << " Read QuerySet Success QuerySet.getListSize() = " << QuerySet.getListSize() << endl;
+//		fout << "QueryCount = " << i << " Read QuerySet Success QuerySet.getListSize() = " << QuerySet.getListSize() << endl;
 		query_start = clock();
 		for (QuerySet.setStart(); QuerySet.getValue(Query); QuerySet.next()){
 			Result->clear();
 			helper->disQuery_t(Query, Result);
-			//fout << "Result.size() = " << Result->getListSize() << endl;
+//			fout << "Result.size() = " << Result->getListSize() << endl;
 		}
 		query_end = clock();
 		process_time = (double)((query_end - query_start) * 1000) / (CLOCKS_PER_SEC*QuerySet.getListSize());
@@ -227,6 +228,7 @@ int main(int argc, char **argv){
 		fout << process_time << endl;
 		QuerySet.clear();
 	}
+	fout.close();
 	//delete helper;
 	system("pause");
 }
