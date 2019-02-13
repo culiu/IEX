@@ -11,7 +11,7 @@
 #include "iterator"
 #include <set>
 #define DATA_NUMS 500000
-#define KEYSIZE 500000
+#define KEYSIZE 850000
 #define EMM_SIZE 9000000
 #pragma comment(linker, "/STACK:1024000000,1024000000")
 using namespace std;
@@ -65,7 +65,7 @@ vector<string> vectors_intersection(const vector<string> &v1, const vector<strin
 
 void genEMMData
 (AList<InvertedNode, CompINode> &IDataSet, HashTable<string, InvertedNode, StringKeyHash> *A1, HashTable<string, Node, StringKeyHash> *A2,
-HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *EMM, int &indexSize){
+HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash > *EMM, long long int &indexSize){
 	//double p = 0.2;
 	/*保存当前关键字的内层table*/
 	HashTable<string, AList<string, CompStr>*, StringKeyHash> *temp_table;
@@ -164,7 +164,7 @@ int main(int argc, char **argv){
 		= new HashTable<string, HashTable<string, AList<string, CompStr>*, StringKeyHash>*, StringKeyHash >(tableMaxsize);
 	time_t EMM_start;
 	time_t EMM_end;
-	int indexSize = 0;
+	long long int indexSize = 0;
 	EMM_start = clock();
 	fout << DataSet.getListSize() << endl;
 	genEMMData(DataSet, key_idtable, id_keytable, EMM, indexSize);
